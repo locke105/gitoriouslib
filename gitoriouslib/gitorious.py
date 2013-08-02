@@ -26,7 +26,7 @@ class Gitorious(object):
     def __init__(self, uri_base, email, passwd):
         # uri_base is something like http://gitorious.example.com
         # or if you are using HTTPS, https://secure.example.com
-        self.gitorious_base_url = self.uri_base
+        self.gitorious_base_url = uri_base
         self.email = email
         self.passwd = passwd
         self.http = httplib2.Http(disable_ssl_certificate_validation=True)
