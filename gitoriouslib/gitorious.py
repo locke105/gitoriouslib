@@ -66,7 +66,7 @@ class Gitorious(object):
             print content
             raise Exception("Auth failed! Status code %s" % resp['status'])
 
-    def create_repo(self, repo_name, project_name):
+    def create_repo(self, repo_name, project_name, private_repo=False):
         if self.auth_cookie is None:
             self._auth()
 
@@ -86,8 +86,9 @@ class Gitorious(object):
         create_data = {'repository[name]': repo_name,
                        'repository[description]': repo_name,
                        'repository[merge_requests_enabled]': 1,
-                       'private_repository': 0,
                        'authenticity_token': token}
+        if private_repo:
+            create_data['private_repository'] = 1
         resp, content = self.http.request(create_url, 'POST',
                                           headers=create_headers,
                                           body=urllib.urlencode(create_data))
