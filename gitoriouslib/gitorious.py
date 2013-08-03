@@ -23,10 +23,10 @@ import httplib2
 
 class Gitorious(object):
 
-    def __init__(self, uri_base, email, passwd):
-        # uri_base is something like http://gitorious.example.com
+    def __init__(self, base_url, email, passwd):
+        # base_url is something like http://gitorious.example.com
         # or if you are using HTTPS, https://secure.example.com
-        self.gitorious_base_url = uri_base
+        self.gitorious_base_url = base_url
         self.email = email
         self.passwd = passwd
         self.http = httplib2.Http(disable_ssl_certificate_validation=True)

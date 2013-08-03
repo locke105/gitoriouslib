@@ -1,0 +1,4 @@
+[gitoriouslib]
+base_url=http://gitorious.example.com
+email=someuser@example.com
+passwd=secret
