@@ -58,12 +58,16 @@ def _get_combined_config():
 
 def create_repo():
     config = _get_combined_config()
-    g = gitorious.Gitorious(**config)
+    g = gitorious.Gitorious(base_url=config['base_url'],
+                            email=config['email'],
+                            passwd=config['passwd'])
     g.create_repo(repo_name=config['repo'],
                   project_name=config['project'])
 
 def delete_repo():
     config = _get_combined_config()
-    g = gitorious.Gitorious(**config)
+    g = gitorious.Gitorious(base_url=config['base_url'],
+                            email=config['email'],
+                            passwd=config['passwd'])
     g.delete_repo(repo_name=config['repo'],
                   project_name=config['project'])
