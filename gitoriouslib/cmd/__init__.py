@@ -20,6 +20,7 @@ import os
 
 from gitoriouslib import gitorious
 
+
 def _parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('project')
@@ -28,6 +29,7 @@ def _parse_args():
     parser.add_argument('--email')
     parser.add_argument('--passwd')
     return parser.parse_args()
+
 
 def _read_config(config_path=''):
     config = ConfigParser.SafeConfigParser()
@@ -63,6 +65,7 @@ def create_repo():
                             passwd=config['passwd'])
     g.create_repo(repo_name=config['repo'],
                   project_name=config['project'])
+
 
 def delete_repo():
     config = _get_combined_config()
