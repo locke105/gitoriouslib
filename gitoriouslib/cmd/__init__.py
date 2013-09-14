@@ -17,6 +17,7 @@
 import argparse
 import ConfigParser
 import os
+from xml.etree import ElementTree as etree
 
 from gitoriouslib import gitorious
 
@@ -65,6 +66,15 @@ def create_repo():
                             passwd=config['passwd'])
     g.create_repo(repo_name=config['repo'],
                   project_name=config['project'])
+    xml_data = g.fetch_repo_metadata(repo_name=config['repo'],
+                                     project_name=config['project'])
+    tree = etree.fromstring(xml_data)
+    push_url = tree.find('push-url').text
+    print 'Repository successfully created!',
+    print ' Run the following to clone and get started:'
+    print ''
+    print '    git clone %s' % push_url
+    print ''
 
 
 def delete_repo():
@@ -74,3 +84,4 @@ def delete_repo():
                             passwd=config['passwd'])
     g.delete_repo(repo_name=config['repo'],
                   project_name=config['project'])
+    print 'Repository successfully removed.'

@@ -61,14 +61,31 @@ class Gitorious(object):
 
         self.auth_cookie = resp['set-cookie']
 
-        if resp['status'][0] not in ('2', '3'):
-            print resp
-            print content
-            raise Exception("Auth failed! Status code %s" % resp['status'])
+        self._verify_response(resp)
 
-    def create_repo(self, repo_name, project_name, private_repo=False):
+    def _verify_response(self, response):
+        if response['status'][0] not in ('2', '3'):
+            print response
+            raise Exception("Request failed! Status code %s" %
+                            response['status'])
+
+    def _ensure_auth(self):
         if self.auth_cookie is None:
             self._auth()
+
+    def fetch_repo_metadata(self, repo_name, project_name):
+        self._ensure_auth()
+
+        repo_data_url = ('%s/%s/%s.xml' %
+                         (self.gitorious_base_url, project_name, repo_name))
+        headers = {'Cookie': self.auth_cookie}
+        resp, content = self.http.request(repo_data_url, 'GET',
+                                          headers=headers)
+        self._verify_response(resp)
+        return content
+
+    def create_repo(self, repo_name, project_name, private_repo=False):
+        self._ensure_auth()
 
         form_url = ('%s/%s/repositories/new' %
                     (self.gitorious_base_url, project_name))
@@ -93,14 +110,11 @@ class Gitorious(object):
                                           headers=create_headers,
                                           body=urllib.urlencode(create_data))
 
-        if resp['status'][0] not in ('2', '3'):
-            print resp
-            print content
-            raise Exception("Request failed! Status code %s" % resp['status'])
+        self._verify_response(resp)
+
 
     def delete_repo(self, repo_name, project_name):
-        if self.auth_cookie is None:
-            self._auth()
+        self._ensure_auth()
 
         form_url = ('%s/%s/%s/confirm_delete' %
                     (self.gitorious_base_url, project_name, repo_name))
@@ -121,7 +135,4 @@ class Gitorious(object):
                                           headers=delete_headers,
                                           body=urllib.urlencode(delete_data))
 
-        if resp['status'][0] not in ('2', '3'):
-            print resp
-            print content
-            raise Exception("Request failed! Status code %s" % resp['status'])
+        self._verify_response(resp)
