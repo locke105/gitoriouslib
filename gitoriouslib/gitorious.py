@@ -17,6 +17,7 @@
 
 import re
 import urllib
+import xml.etree.ElementTree as ET
 
 import httplib2
 
@@ -73,7 +74,7 @@ class Gitorious(object):
         if self.auth_cookie is None:
             self._auth()
 
-    def fetch_repo_metadata(self, repo_name, project_name):
+    def _fetch_repo_xml(self, repo_name, project_name):
         self._ensure_auth()
 
         repo_data_url = ('%s/%s/%s.xml' %
@@ -83,6 +84,39 @@ class Gitorious(object):
                                           headers=headers)
         self._verify_response(resp)
         return content
+
+    def get_repo_info(self, repo_name, project_name):
+        repo_data = self._fetch_repo_xml(repo_name, project_name)
+        repo_tree = ET.fromstring(repo_data)
+        repo = {}
+        for child in repo_tree:
+            repo[child.tag] = child.text
+
+        return repo
+
+    def _fetch_project_xml(self, project_name):
+        self._ensure_auth()
+
+        repo_data_url = ('%s/%s.xml' %
+                         (self.gitorious_base_url, project_name))
+        headers = {'Cookie': self.auth_cookie}
+        resp, content = self.http.request(repo_data_url, 'GET',
+                                          headers=headers)
+        self._verify_response(resp)
+        return content
+
+    def list_repos(self, project_name):
+        project_data = self._fetch_project_xml(project_name)
+        proj_tree = ET.fromstring(project_data)
+        repo_nodes = proj_tree.findall('./repositories/mainlines/repository')
+        repositories = []
+        for repo_node in repo_nodes:
+            repo = {}
+            for child in repo_node:
+                repo[child.tag] = child.text
+            repositories.append(repo)
+
+        return repositories
 
     def create_repo(self, repo_name, project_name, private_repo=False):
         self._ensure_auth()

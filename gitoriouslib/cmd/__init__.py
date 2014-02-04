@@ -66,10 +66,9 @@ def create_repo():
                             passwd=config['passwd'])
     g.create_repo(repo_name=config['repo'],
                   project_name=config['project'])
-    xml_data = g.fetch_repo_metadata(repo_name=config['repo'],
-                                     project_name=config['project'])
-    tree = etree.fromstring(xml_data)
-    push_url = tree.find('push-url').text
+    repo_info = g.get_repo_info(repo_name=config['repo'],
+                                project_name=config['project'])
+    push_url = repo_info['push-url']
     print 'Repository successfully created!',
     print ' Run the following to clone and get started:'
     print ''
